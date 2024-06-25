@@ -1,7 +1,7 @@
 package model;
 
-public class Moto {
+public class Moto extends Vehicle{
     public Moto(String plate) {
-        super();
+        super(plate);
     }
 }
