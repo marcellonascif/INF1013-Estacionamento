@@ -9,24 +9,52 @@ import java.util.List;
 
 public class AccessControl {
 
-    public static void accessControl(String plate, ParkingLot parkingLot, Access access) {
+    public static void accessControlIn(String plate, ParkingLot parkingLot, Access access) {
         System.out.println("Tentativa de acesso para o veículo com placa " + plate);
 
         Vehicle vehicle = access.isVehicleRegistered(plate);
         if (vehicle == null) {
-            System.out.println("Veículo com placa " + plate + " não está cadastrado");
+            System.out.println("Veículo com placa " + plate + " não está cadastrado\n");
             return;
         }
 
-        if (!parkingLot.isFull()) {
-            System.out.println("Estacionamento lotado. Acesso negado.");
+        if (access.isVehicleInside(plate)) {
+            System.out.println("Veículo com placa " + plate + " já está dentro do estacionamento\n");
+            return;
+        }
+
+        if (parkingLot.isFull()) {
+            System.out.println("Estacionamento lotado. Acesso negado.\n");
             return;
         }
 
         access.open();
-        access.registerInOut(vehicle, parkingLot);
+        access.registerIn(vehicle, parkingLot);
         access.close();
-        System.out.println("Veículo com placa " + plate + " entrou no estacionamento.");
+        System.out.println("Veículo com placa " + plate + " entrou no estacionamento.\n");
+    }
+
+    public static void accessControlOut(String plate, ParkingLot parkingLot, Access access) {
+        System.out.println("Tentativa de saída para o veículo com placa " + plate);
+
+        // faz sentido essa verificacao? acho que sim pois pode ter acontecido algum problema na entrada do veiculo
+        
+        Vehicle vehicle = access.isVehicleRegistered(plate);
+        if (vehicle == null) {
+            System.out.println("Veículo com placa " + plate + " não está cadastrado\n");
+            return;
+        }
+
+
+        if (!access.isVehicleInside(plate)) {
+            System.out.println("Veículo com placa " + plate + " não está dentro do estacionamento\n");
+            return;
+        }
+
+        access.open();
+        access.registerOut(vehicle, parkingLot);
+        access.close();
+        System.out.println("Veículo com placa " + plate + " saiu do estacionamento.\n");
     }
 
 //    public static ParkingLot loadJSON(String filename) {
@@ -49,10 +77,8 @@ public class AccessControl {
 
     public static void main(String[] args) {
         ParkingLot parkingCar = new ParkingLot(3);
-        ParkingLot parkingMoto = new ParkingLot(1);
 
         Access accessCar = new Access();
-        Access accessMoto = new Access();
 
         Vehicle car1 = new Car("AAA1234");
         Vehicle car2 = new Car("BBB5678");
@@ -65,16 +91,18 @@ public class AccessControl {
         listCar.add(car3);
         listCar.add(car4);
 
-        Vehicle moto1 = new Moto("AAA2204");
-        Vehicle moto2 = new Car("BBB1806");
-
         accessCar.setRegisteredVehicles(listCar);
 
         // Simulando tentativas de acesso
-        AccessControl.accessControl("AAA1234", parkingCar, accessCar);
-        AccessControl.accessControl("BBB5678", parkingCar, accessCar);
-        AccessControl.accessControl("CCC9012", parkingCar, accessCar);
-        AccessControl.accessControl("CCC2204", parkingCar, accessCar);
-        AccessControl.accessControl("DDD1806", parkingCar, accessCar);
+        AccessControl.accessControlIn("AAA1234", parkingCar, accessCar);
+        AccessControl.accessControlIn("BBB5678", parkingCar, accessCar);
+        AccessControl.accessControlIn("CCC9012", parkingCar, accessCar);
+        AccessControl.accessControlIn("CCC2204", parkingCar, accessCar);
+        AccessControl.accessControlIn("DDD1806", parkingCar, accessCar);
+
+        AccessControl.accessControlOut("AAA1234", parkingCar, accessCar);
+        AccessControl.accessControlIn("DDD1806", parkingCar, accessCar);
+
+
     }
 }
