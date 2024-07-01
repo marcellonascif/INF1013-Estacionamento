@@ -1,5 +1,6 @@
 package model;
 
+import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,12 +21,14 @@ public class Access {
         System.out.println("fechar");
     }
 
-    public void getRegisteredVehiclesJSON() {
-//        USAR O RESGATE DE JSON AQUI
+    public String getRegisteredVehiclesJSON() {
+        Gson gson = new Gson();
+        return gson.toJson(this.registeredVehicles);
     }
 
-    public void getInsideVehiclesJSON() {
-//        USAR O RESGATE DE JSON AQUI TAMBÉM
+    public String getInsideVehiclesJSON() {
+        Gson gson = new Gson();
+        return gson.toJson(this.vehiclesInside);
     }
 
     public Vehicle isVehicleRegistered(String plate){

@@ -1,9 +1,10 @@
 package model;
 
-//import java.io.BufferedReader;
-//import java.io.File;
-//import java.io.FileReader;
-//import java.io.IOException;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,14 +38,11 @@ public class AccessControl {
     public static void accessControlOut(String plate, ParkingLot parkingLot, Access access) {
         System.out.println("Tentativa de saída para o veículo com placa " + plate);
 
-        // faz sentido essa verificacao? acho que sim pois pode ter acontecido algum problema na entrada do veiculo
-        
         Vehicle vehicle = access.isVehicleRegistered(plate);
         if (vehicle == null) {
             System.out.println("Veículo com placa " + plate + " não está cadastrado\n");
             return;
         }
-
 
         if (!access.isVehicleInside(plate)) {
             System.out.println("Veículo com placa " + plate + " não está dentro do estacionamento\n");
@@ -57,52 +55,42 @@ public class AccessControl {
         System.out.println("Veículo com placa " + plate + " saiu do estacionamento.\n");
     }
 
-//    public static ParkingLot loadJSON(String filename) {
-//        String jsonText = "";
-//        try {
-//            BufferedReader bufferedReader = new BufferedReader(new FileReader(filename));
-//
-//            String line;
-//            while((line = bufferedReader.readLine()) != null){
-//                jsonText += line + "\n";
-//            }
-//
-//            bufferedReader.close();
-//
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//            return new ParkingLot(100); // Valor default para vagas disponíveis
-//        }
-//    }
+    public static List<Vehicle> loadVehiclesFromJSON(String filename) {
+        Gson gson = new Gson();
+        try {
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(
+                    AccessControl.class.getClassLoader().getResourceAsStream(filename)));
+            Type vehicleListType = new TypeToken<ArrayList<Vehicle>>() {}.getType();
+            List<Vehicle> vehicles = gson.fromJson(bufferedReader, vehicleListType);
+            bufferedReader.close();
+            return vehicles;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<>(); // Retorna uma lista vazia em caso de erro
+        }
+    }
 
     public static void main(String[] args) {
         ParkingLot parkingCar = new ParkingLot(3);
 
         Access accessCar = new Access();
 
-        Vehicle car1 = new Car("AAA1234");
-        Vehicle car2 = new Car("BBB5678");
-        Vehicle car3 = new Car("CCC2204");
-        Vehicle car4 = new Car("DDD1806");
-
-        List<Vehicle> listCar = new ArrayList<>();
-        listCar.add(car1);
-        listCar.add(car2);
-        listCar.add(car3);
-        listCar.add(car4);
-
+        // Carregar veículos a partir de um arquivo JSON
+        List<Vehicle> listCar = loadVehiclesFromJSON("vehicles.json");
         accessCar.setRegisteredVehicles(listCar);
 
         // Simulando tentativas de acesso
-        AccessControl.accessControlIn("AAA1234", parkingCar, accessCar);
-        AccessControl.accessControlIn("BBB5678", parkingCar, accessCar);
-        AccessControl.accessControlIn("CCC9012", parkingCar, accessCar);
-        AccessControl.accessControlIn("CCC2204", parkingCar, accessCar);
-        AccessControl.accessControlIn("DDD1806", parkingCar, accessCar);
+        AccessControl.accessControlIn("ABC-1A23", parkingCar, accessCar);
+        AccessControl.accessControlIn("DEF-4B56", parkingCar, accessCar);
+        AccessControl.accessControlIn("GHI-7C89", parkingCar, accessCar);
+        AccessControl.accessControlIn("CCC-2204", parkingCar, accessCar);
+        AccessControl.accessControlIn("DDD-1806", parkingCar, accessCar);
 
-        AccessControl.accessControlOut("AAA1234", parkingCar, accessCar);
-        AccessControl.accessControlIn("DDD1806", parkingCar, accessCar);
+        AccessControl.accessControlOut("ABC-1A23", parkingCar, accessCar);
+        AccessControl.accessControlIn("MNO-3E45", parkingCar, accessCar);
 
-
+        // Exibir veículos registrados e veículos dentro do estacionamento como JSON
+        System.out.println("Registered Vehicles JSON: " + accessCar.getRegisteredVehiclesJSON());
+        System.out.println("Vehicles Inside JSON: " + accessCar.getInsideVehiclesJSON());
     }
 }
