@@ -1,11 +1,7 @@
-package model;
+package core;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import static util.JSONReader.reader;
 
-import java.io.FileReader;
-import java.io.IOException;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,15 +23,7 @@ public class Access {
     }
 
     public List<Vehicle> getRegisteredVehiclesJSON() {
-        Gson gson = new Gson();
-        try (FileReader reader = new FileReader("assets/vehicles.json")) {
-            Type vehicleListType = new TypeToken<List<Vehicle>>() {
-            }.getType();
-            return gson.fromJson(reader, vehicleListType);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
+        return reader("assets/vehicles.json");
     }
 
     public Vehicle isVehicleRegistered(String plate) {

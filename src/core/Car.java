@@ -1,4 +1,4 @@
-package model;
+package core;
 
 public class Car extends Vehicle{
     public Car(String plate){

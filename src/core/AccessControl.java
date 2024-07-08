@@ -1,4 +1,4 @@
-package model;
+package core;
 
 public class AccessControl {
 
@@ -51,6 +51,7 @@ public class AccessControl {
         ParkingLot parkingCar = new ParkingLot(3);
 
         Access accessCar = new Access();
+
 
         accessCar.setRegisteredVehicles(accessCar.getRegisteredVehiclesJSON());
 
